@@ -30,7 +30,7 @@ public final class TraceContext implements Serializable {
     long startTime = 0L;
     long endTime = 0L;
 
-    private TraceContext parentTraceContext;
+    TraceContext parentTraceContext;
     private AtomicInteger rpcCounter = new AtomicInteger(0);
 
     public TraceContext() {

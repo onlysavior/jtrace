@@ -31,6 +31,11 @@ public class TraceContextRollingAppender implements TraceContextAppender {
     private final boolean selfLogEnabled;
 
     public TraceContextRollingAppender(String file, long maxFileSize, boolean append,
+                                       boolean selfLogEnabled) {
+        this(file, maxFileSize, append, selfLogEnabled, DEFAULT_BUFFER_SIZE);
+    }
+
+    public TraceContextRollingAppender(String file, long maxFileSize, boolean append,
                                        boolean selfLogEnabled, int bufferSize) {
         this.fileName = file;
         this.maxFileSize = maxFileSize;

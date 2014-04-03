@@ -13,7 +13,7 @@ import java.util.List;
  * Time: 下午11:13
  * To change this template use File | Settings | File Templates.
  */
-public class MySQLStoreProvider implements TableStroreProvider {
+public class MySQLStoreProvider extends LifeCycleSupport implements TableStroreProvider {
     private static final String CREATE_TABLE_SQL = "aaa";
     private static final String UPDATE_SQL = "bbb";
     private static final String INSERT_SQL = "ccc";
@@ -25,21 +25,37 @@ public class MySQLStoreProvider implements TableStroreProvider {
     private PreparedStatement insertPs;
     private PreparedStatement selectPs;
 
-    public void start(String connectionInfo) throws SQLException {
-        connection = DriverManager.getConnection(connectionInfo);
-        updatePs = connection.prepareStatement(UPDATE_SQL);
-        insertPs = connection.prepareStatement(INSERT_SQL);
-        selectPs = connection.prepareStatement(SELECT_SQL);
+    private String connectionInfo;
 
-        Statement createStament = connection.createStatement();
-        createStament.execute(CREATE_TABLE_SQL);
+    public MySQLStoreProvider(String connectionInfo) {
+        this.connectionInfo = connectionInfo;
     }
 
-    public void stop() throws SQLException {
-        updatePs.close();
-        insertPs.close();
-        selectPs.close();
-        connection.close();
+    public void start() {
+        super.start();
+        try {
+            connection = DriverManager.getConnection(connectionInfo);
+            updatePs = connection.prepareStatement(UPDATE_SQL);
+            insertPs = connection.prepareStatement(INSERT_SQL);
+            selectPs = connection.prepareStatement(SELECT_SQL);
+
+            Statement createStament = connection.createStatement();
+            createStament.execute(CREATE_TABLE_SQL);
+        } catch (SQLException e) {
+            throw new StoreException(e);
+        }
+    }
+
+    public void stop() {
+        super.stop();
+        try {
+            updatePs.close();
+            insertPs.close();
+            selectPs.close();
+            connection.close();
+        } catch (SQLException e) {
+            throw new StoreException(e);
+        }
     }
 
     @Override

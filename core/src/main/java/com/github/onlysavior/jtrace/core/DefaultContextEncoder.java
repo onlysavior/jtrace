@@ -32,7 +32,9 @@ public class DefaultContextEncoder implements TraceContextEncoder {
                     buffer.append(ctx.serverName).append('|')
                             .append(ctx.remoteIp).append('|');
                 }
-                buffer.append(ctx.traceName);
+                buffer.append(ctx.traceName).append("|");
+                buffer.append(ctx.entrySign).append("|");
+                buffer.append(ctx.nodeSign);
                 break;
             case Jtrace.LOG_TYPE_RPC_END:
                 buffer.append(ctx.traceId).append('|')
@@ -44,7 +46,9 @@ public class DefaultContextEncoder implements TraceContextEncoder {
                         .append(ctx.methodName).append('|')
                         .append(ctx.remoteIp).append('|')
                         .append('[').append(ctx.span0).append(", ").append(ctx.spna1).append(']').append('|')
-                        .append(ctx.traceName);
+                        .append(ctx.traceName).append("|")
+                        .append(ctx.entrySign).append("|")
+                        .append(ctx.nodeSign);
                 break;
             case Jtrace.LOG_TYPE_SERVER_SEND:
                 buffer.append(ctx.traceId).append('|')
@@ -57,7 +61,10 @@ public class DefaultContextEncoder implements TraceContextEncoder {
                     buffer.append(ctx.methodName).append('|');
                 }
                 buffer.append(ctx.remoteIp).append('|')
-                        .append(ctx.endTime - ctx.startTime);
+                        .append(ctx.endTime - ctx.startTime)
+                        .append("|")
+                        .append(ctx.entrySign)
+                        .append(ctx.nodeSign);
                 break;
             /*case Jtrace.LOG_TYPE_RPC_LOG:
                 buffer.append(ctx.traceId).append('|')

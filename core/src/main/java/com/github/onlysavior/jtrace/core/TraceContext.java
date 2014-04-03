@@ -30,6 +30,9 @@ public final class TraceContext implements Serializable {
     long startTime = 0L;
     long endTime = 0L;
 
+    long entrySign = 0L;
+    long nodeSign = 0L;
+
     TraceContext parentTraceContext;
     private AtomicInteger rpcCounter = new AtomicInteger(0);
 
@@ -55,6 +58,7 @@ public final class TraceContext implements Serializable {
         this.parentSpanId = parentSpanId;
         this.spanId = spanId;
         this.parentTraceContext = parentTraceContext;
+        this.entrySign = parentTraceContext.entrySign;
     }
 
     public TraceContext createChildContext() {
@@ -77,6 +81,8 @@ public final class TraceContext implements Serializable {
         this.spna1 = other.spna1;
         this.traceName = other.traceName;
         this.traceId = other.traceId;
+        this.entrySign = other.entrySign;
+        this.nodeSign = other.nodeSign;
     }
 
     String nextSpanId() {
@@ -93,6 +99,7 @@ public final class TraceContext implements Serializable {
 
     public void startTrace(String traceName) {
         this.traceName = traceName;
+        this.entrySign = traceName.hashCode();
         this.startTime = System.currentTimeMillis();
     }
 
@@ -122,10 +129,11 @@ public final class TraceContext implements Serializable {
         this.span0 = (int) (System.currentTimeMillis() - this.startTime);
     }
 
-    public void rpcServerRecv(String serverName, String methodName) {
+    public void rpcServerRecv(String serverName, String methodName, long sign) {
         this.startTime = System.currentTimeMillis();
         this.serverName = serverName;
         this.methodName = methodName;
+        this.nodeSign = 31*sign + serverName.hashCode();
     }
 
     public void rpcServerSend(int type) {

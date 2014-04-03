@@ -377,7 +377,7 @@ public class Jtrace {
         if (current == null) {
             return;
         }
-        current.rpcServerRecv(serverName, method);
+        current.rpcServerRecv(serverName, method, current.nodeSign);
     }
 
     public static void rpcServerSend() {

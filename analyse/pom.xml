@@ -11,5 +11,10 @@
 
     <artifactId>analyse</artifactId>
 
-
+    <dependencies>
+        <dependency>
+            <groupId>jtrace</groupId>
+            <artifactId>store</artifactId>
+        </dependency>
+    </dependencies>
 </project>

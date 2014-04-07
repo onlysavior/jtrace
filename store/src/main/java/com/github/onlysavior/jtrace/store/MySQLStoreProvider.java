@@ -13,17 +13,19 @@ import java.util.List;
  * Time: 下午11:13
  * To change this template use File | Settings | File Templates.
  */
-public class MySQLStoreProvider extends LifeCycleSupport implements TableStroreProvider {
+public class MySQLStoreProvider extends LifeCycleSupport implements TableStroreProvider,FastLocate {
     private static final String CREATE_TABLE_SQL = "aaa";
     private static final String UPDATE_SQL = "bbb";
     private static final String INSERT_SQL = "ccc";
     private static final String SELECT_SQL = "ddd";
     private static final String VISIT_SQL = "eee";
+    private static final String FAST_LOCATE = "fff";
 
     private Connection connection;
     private PreparedStatement updatePs;
     private PreparedStatement insertPs;
     private PreparedStatement selectPs;
+    private PreparedStatement fastPs;
 
     private String connectionInfo;
 
@@ -38,6 +40,7 @@ public class MySQLStoreProvider extends LifeCycleSupport implements TableStroreP
             updatePs = connection.prepareStatement(UPDATE_SQL);
             insertPs = connection.prepareStatement(INSERT_SQL);
             selectPs = connection.prepareStatement(SELECT_SQL);
+            fastPs = connection.prepareStatement(FAST_LOCATE);
 
             Statement createStament = connection.createStatement();
             createStament.execute(CREATE_TABLE_SQL);
@@ -83,10 +86,9 @@ public class MySQLStoreProvider extends LifeCycleSupport implements TableStroreP
     }
 
     @Override
-    public List<Serializable> byId(String traceId) {
+    public List<Serializable> byId(String path) {
         try {
-            selectPs.setNString(1, extractDate(traceId));
-            selectPs.setNString(2, extractDate(traceId));
+            selectPs.setNString(1, extractDate(path));
 
             ResultSet rs =  selectPs.executeQuery();
             return collect(rs, null);
@@ -98,8 +100,9 @@ public class MySQLStoreProvider extends LifeCycleSupport implements TableStroreP
     @Override
     public List<Serializable> range(String min, String max) {
         try {
-            selectPs.setNString(1, extractDate(min));
-            selectPs.setNString(2, extractDate(max));
+            //FIXME: 正则
+            selectPs.setNString(1, min);
+            selectPs.setNString(2, max);
 
             ResultSet rs =  selectPs.executeQuery();
             return collect(rs, null);
@@ -130,7 +133,7 @@ public class MySQLStoreProvider extends LifeCycleSupport implements TableStroreP
         if (rs != null) {
             while (rs.next()) {
                 MySQLRow row = new MySQLRow();
-                row.setTraceId(rs.getNString(1));
+                row.setPath(rs.getNString(1));
                 row.setRt(rs.getInt(2));
                 row.setQps(rs.getLong(3));
 
@@ -145,17 +148,35 @@ public class MySQLStoreProvider extends LifeCycleSupport implements TableStroreP
         return null;
     }
 
+    @Override
+    public String locate(long entrySign, long nodeSign) {
+        try {
+            fastPs.setLong(1, entrySign);
+            fastPs.setLong(2, nodeSign);
+
+            ResultSet rs = fastPs.executeQuery();
+            if (rs != null) {
+               while (rs.next()) {
+                    return rs.getString(1);
+               }
+            }
+        } catch (SQLException e) {
+            throw new StoreException(e);
+        }
+        return null;
+    }
+
     public static class MySQLRow implements Serializable {
-        String traceId;
+        String path;
         int rt;
         long qps;
 
-        public String getTraceId() {
-            return traceId;
+        public String getPath() {
+            return path;
         }
 
-        public void setTraceId(String traceId) {
-            this.traceId = traceId;
+        public void setPath(String path) {
+            this.path = path;
         }
 
         public int getRt() {

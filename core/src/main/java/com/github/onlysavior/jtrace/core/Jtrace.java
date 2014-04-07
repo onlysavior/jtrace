@@ -44,7 +44,7 @@ public class Jtrace {
     static final TraceContext TYPE_FLUSH = new TraceContext(LOG_TYPE_EVENT_FLUSH);
     static final int LOG_TYPE_EVENT_ROLLOVER = -2;
     static final TraceContext EVENT_LOG_ROLLOVER = new TraceContext(LOG_TYPE_EVENT_ROLLOVER);
-    static final Charset DEFAULT_CHARACTER;
+    public static final Charset DEFAULT_CHARACTER;
     static {
         Charset cs;
         try {

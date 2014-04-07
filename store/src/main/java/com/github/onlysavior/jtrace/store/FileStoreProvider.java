@@ -14,7 +14,7 @@ import java.util.List;
  * Time: 下午9:39
  * To change this template use File | Settings | File Templates.
  */
-public class FileStoreProvider implements SequenceStroreProvider {
+public class FileStoreProvider extends LifeCycleSupport implements SequenceStroreProvider {
     static final String FILE_NAME = "filestore";
     static final int MAX_RETURN_SIZE = 2048;
     static final long INTERVAL = 60 * 60 * 1000;

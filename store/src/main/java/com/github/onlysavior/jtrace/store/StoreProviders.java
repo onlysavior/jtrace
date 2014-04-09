@@ -20,4 +20,8 @@ public class StoreProviders {
     public static RRDStoreProvider rrd(String base, String appName) {
         return new RRDStoreProvider(base, appName);
     }
+
+    public static HbaseStoreProvider hbase() {
+        return new HbaseStoreProvider();
+    }
 }

@@ -32,10 +32,10 @@ public class Jtrace {
     static final long MAX_SELF_LOG_FILE_SIZE = 200 * 1024 * 1024; // 200MB
     static final long MAX_RPC_LOG_FILE_SIZE = 300 * 1024 * 1024; // 300MB
 
-    static final int LOG_TYPE_TRACE_END = 1;
-    static final int LOG_TYPE_RPC_END = 2;
-    static final int LOG_TYPE_SERVER_SEND = 3;
-    static final int LOG_TYPE_EVENT_FLUSH = -1;
+    public static final int LOG_TYPE_TRACE_END = 1;
+    public static final int LOG_TYPE_RPC_END = 2;
+    public static final int LOG_TYPE_SERVER_SEND = 3;
+    public static final int LOG_TYPE_EVENT_FLUSH = -1;
 
     static public final int TYPE_TRACE = 0;
     static public final int TYPE_RPC_CLIENT = 1;

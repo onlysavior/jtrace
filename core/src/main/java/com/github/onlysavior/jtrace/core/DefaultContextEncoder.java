@@ -27,14 +27,16 @@ public class DefaultContextEncoder implements TraceContextEncoder {
                 buffer.append(ctx.traceId).append('|')
                         .append(ctx.startTime).append('|')
                         .append(ctx.rpcType).append('|')
-                        .append(ctx.endTime - ctx.startTime).append('|');
+                        .append(ctx.endTime - ctx.startTime).append('|')
+                        .append(ctx.traceName).append("|")
+                        .append(ctx.entrySign).append("|")
+                        .append(ctx.nodeSign);
                 if (StringUtils.isNotBlank(ctx.serverName)) {
-                    buffer.append(ctx.serverName).append('|')
-                            .append(ctx.remoteIp).append('|');
+                    buffer.append(ctx.serverName).append('|');
+                    if (StringUtils.isNotBlank(ctx.remoteIp)) {
+                        buffer.append(ctx.remoteIp).append('|');
+                    }
                 }
-                buffer.append(ctx.traceName).append("|");
-                buffer.append(ctx.entrySign).append("|");
-                buffer.append(ctx.nodeSign);
                 break;
             case Jtrace.LOG_TYPE_RPC_END:
                 buffer.append(ctx.traceId).append('|')

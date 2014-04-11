@@ -49,7 +49,7 @@ public class HbaseStoreProvider extends LifeCycleSupport implements TableStroreP
         }
     }
 
-    public void updateRT(String rowKey, int rt) {
+    public void updateRT(String rowKey, long rt) {
         try {
             HTable table = new HTable(configuration, TABLE_NAME);
             Put put = new Put(Bytes.toBytes("+"+rowKey));

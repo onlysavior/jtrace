@@ -62,8 +62,8 @@ public class DefaultContextEncoder implements TraceContextEncoder {
                         .append(ctx.rpcType).append('|')
                         .append(ctx.endTime - ctx.startTime)
                         .append(ctx.parentSpanId).append('|')
-                        .append(ctx.spanId).append('|');
-                buffer.append(ctx.remoteIp).append('|')
+                        .append(ctx.spanId).append('|')
+                        .append(ctx.remoteIp).append('|')
                         .append(ctx.entrySign).append('|')
                         .append(ctx.nodeSign);
                 if (StringUtils.isNotBlank(ctx.serverName) && StringUtils.isNotBlank(ctx.methodName)) {

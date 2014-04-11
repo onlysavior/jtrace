@@ -136,12 +136,12 @@ public class MySQLStoreProvider extends LifeCycleSupport implements TableStroreP
     }
 
     @Override
-    public void storeInPath(String rowKey, String path) {
+    public void storeInPath(String rowKey, long count) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void storeOutPath(String rowKey, String path, int rt) {
+    public void storeOutPath(String rowKey, long count) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

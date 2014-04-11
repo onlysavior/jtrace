@@ -29,5 +29,13 @@
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.storm</groupId>
+            <artifactId>storm-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-all</artifactId>
+        </dependency>
     </dependencies>
 </project>

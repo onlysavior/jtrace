@@ -24,5 +24,14 @@
             <groupId>org.apache.flume</groupId>
             <artifactId>flume-ng-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jtrace</groupId>
+            <artifactId>core</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

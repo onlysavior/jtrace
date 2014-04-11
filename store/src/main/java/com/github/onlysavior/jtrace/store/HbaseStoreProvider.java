@@ -1,6 +1,5 @@
 package com.github.onlysavior.jtrace.store;
 
-import com.github.onlysavior.jtrace.core.Jtrace;
 import com.github.onlysavior.jtrace.core.StringUtils;
 import com.github.onlysavior.jtrace.core.TraceSign;
 import org.apache.hadoop.conf.Configuration;
@@ -37,6 +36,7 @@ public class HbaseStoreProvider extends LifeCycleSupport implements TableStroreP
 
         try {
             HBaseAdmin hAdmin = new HBaseAdmin(configuration);
+
             if (!hAdmin.tableExists(TABLE_NAME)) {
                 createTable(hAdmin, TABLE_NAME);
             }
@@ -49,25 +49,17 @@ public class HbaseStoreProvider extends LifeCycleSupport implements TableStroreP
         }
     }
 
-    @Override
-    public void updateOrStore(String rowKey, int rt) {
+    public void updateRT(String rowKey, int rt) {
         try {
-            putJtrace(ByteBuffer.wrap(rowKey.getBytes(Jtrace.DEFAULT_CHARACTER)), rt);
-            putFastLocate(rowKey);
+            HTable table = new HTable(configuration, TABLE_NAME);
+            Put put = new Put(Bytes.toBytes("+"+rowKey));
+            put.add(Bytes.toBytes("data"), Bytes.toBytes("rt"), Bytes.toBytes(rt));
+            table.put(put);
         } catch (IOException e) {
             throw new StoreException(e);
         }
     }
 
-    @Override
-    public void updateOrStore(ByteBuffer rowKey, int rt) {
-        try {
-            putJtrace(rowKey, rt);
-            putFastLocate(new String(rowKey.array()));
-        } catch (IOException e) {
-            throw new StoreException(e);
-        }
-    }
 
     @Override
     public List<Serializable> byId(String path) {
@@ -104,6 +96,7 @@ public class HbaseStoreProvider extends LifeCycleSupport implements TableStroreP
     @Override
     public List<Serializable> range(String min, String max) {
         try {
+            //FIXME custom filter to accept two pattern
             HTable table = new HTable(configuration, TABLE_NAME);
             Scan scan = new Scan();
             Filter less = new RowFilter(CompareFilter.CompareOp.LESS_OR_EQUAL,
@@ -165,13 +158,13 @@ public class HbaseStoreProvider extends LifeCycleSupport implements TableStroreP
         return null;
     }
 
-    private void putJtrace(ByteBuffer rowKey, int rt) throws IOException {
+    private void putJtrace(byte[] rowKey, long rt) throws IOException {
         HTable table = new HTable(configuration, TABLE_NAME);
-        Put put = new Put(rowKey.array());
-        put.add(Bytes.toBytes("data"), Bytes.toBytes("rt"), Bytes.toBytes(rt));
+        Put put = new Put(rowKey);
+        put.add(Bytes.toBytes("data"), Bytes.toBytes("totalcount1hour"), Bytes.toBytes(rt));
 
 
-        Increment inc = new Increment(rowKey.array());
+        Increment inc = new Increment(rowKey);
         inc.setTimeRange(0L, 1000L);
         inc.addColumn(Bytes.toBytes("data"), Bytes.toBytes("qps"), 1);
 
@@ -179,7 +172,7 @@ public class HbaseStoreProvider extends LifeCycleSupport implements TableStroreP
         table.increment(inc);
     }
 
-    private void putFastLocate(String rowKey) {
+    private void putFastLocate(String rowKey, boolean in) {
         String entry = TraceSign.getEntry(rowKey);
         if (StringUtils.isNotBlank(entry)) {
             long entrySign = entry.hashCode();
@@ -188,7 +181,11 @@ public class HbaseStoreProvider extends LifeCycleSupport implements TableStroreP
             try {
                 HTable table = new HTable(configuration, FAST_LOCATE_NAME);
                 Put put = new Put(Bytes.toBytes(""+entrySign+":"+nodeSign));
-                put.add(Bytes.toBytes("data"), Bytes.toBytes("path"), Bytes.toBytes(rowKey));
+                if (in) {
+                    put.add(Bytes.toBytes("data"), Bytes.toBytes("path"), Bytes.toBytes("+"+rowKey));
+                } else {
+                    put.add(Bytes.toBytes("data"), Bytes.toBytes("path"), Bytes.toBytes("-"+rowKey));
+                }
 
                 table.put(put);
             } catch (IOException e) {
@@ -202,6 +199,26 @@ public class HbaseStoreProvider extends LifeCycleSupport implements TableStroreP
         HTableDescriptor tableDesc = new HTableDescriptor(tableName);
         tableDesc.addFamily(new HColumnDescriptor("data"));
         admin.createTable(tableDesc);
+    }
+
+    @Override
+    public void storeInPath(String rowKey, long count) {
+        try {
+            putJtrace(Bytes.toBytes("+"+rowKey), count);
+            putFastLocate(rowKey, true);
+        } catch (IOException e) {
+            throw new StoreException(e);
+        }
+    }
+
+    @Override
+    public void storeOutPath(String rowKey, long count) {
+        try {
+            putJtrace(Bytes.toBytes("-"+rowKey), count);
+            putFastLocate(rowKey, false);
+        }catch (IOException e) {
+            throw new StoreException(e);
+        }
     }
 
     public static class Row implements Serializable {

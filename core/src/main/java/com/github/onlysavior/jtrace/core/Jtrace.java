@@ -21,9 +21,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * To change this template use File | Settings | File Templates.
  */
 public class Jtrace {
-    static String ROOT_SPAN_ID = "0";
-    static String ROOT_PARENT_SPAN_ID = "0";
-    static String MAL_ROOT_RPC_ID = "9";
+    public static String ROOT_SPAN_ID = "0";
+    public static String ROOT_PARENT_SPAN_ID = "0";
+    public static String MAL_ROOT_RPC_ID = "9";
 
     static final String DELETE_FILE_SUBFIX = ".deleted";
     static public final String RPC_RESULT_SUCCESS = "00";

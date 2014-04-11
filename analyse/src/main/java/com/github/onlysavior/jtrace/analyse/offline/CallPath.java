@@ -1,7 +1,7 @@
 package com.github.onlysavior.jtrace.analyse.offline;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,7 +32,7 @@ public class CallPath {
 
     public static class CallNode {
         private CallNode parent;
-        private List<CallNode> children = new ArrayList<CallNode>();
+        private Set<CallNode> children = new LinkedHashSet<CallNode>();
 
         private String traceId;
         private int rpcType;
@@ -47,6 +47,25 @@ public class CallPath {
         private String methodName;
         private String spanId;
         private String parentSpanId;
+        private String path;
+        private String[] pathC;
+        private int pathIndex = 0;
+
+        public CallNode getParent() {
+            return parent;
+        }
+
+        public void setParent(CallNode parent) {
+            this.parent = parent;
+        }
+
+        public Set<CallNode> getChildren() {
+            return children;
+        }
+
+        public void addChild(CallNode child) {
+            this.children.add(child);
+        }
 
         public String getTraceId() {
             return traceId;
@@ -142,6 +161,81 @@ public class CallPath {
 
         public void setParentSpanId(String parentSpanId) {
             this.parentSpanId = parentSpanId;
+        }
+
+        public String getPath() {
+            if (pathIndex == 0) {
+                return path;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(pathC[pathIndex]);
+            for (int index = pathIndex + 1; pathIndex < pathC.length; index++) {
+                sb.append("|");
+                sb.append(pathC[index]);
+            }
+            return sb.toString();
+        }
+
+        public void setPath(String path) {
+            this.path = path;
+            this.pathC = path.split("|");
+        }
+
+        public boolean walk(int step) {
+            assert step < 0 : "illeagl step";
+            if (step > pathC.length) {
+                return false;
+            }
+            pathIndex = step;
+            return true;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof CallNode)) return false;
+
+            CallNode callNode = (CallNode) o;
+
+            if (entrySign != callNode.entrySign) return false;
+            if (last != callNode.last) return false;
+            if (nodeSign != callNode.nodeSign) return false;
+            if (rpcType != callNode.rpcType) return false;
+            if (startTime != callNode.startTime) return false;
+            if (!children.equals(callNode.children)) return false;
+            if (methodName != null ? !methodName.equals(callNode.methodName) : callNode.methodName != null)
+                return false;
+            if (parent != null ? !parent.equals(callNode.parent) : callNode.parent != null) return false;
+            if (parentSpanId != null ? !parentSpanId.equals(callNode.parentSpanId) : callNode.parentSpanId != null)
+                return false;
+            if (remoteIp != null ? !remoteIp.equals(callNode.remoteIp) : callNode.remoteIp != null) return false;
+            if (serverName != null ? !serverName.equals(callNode.serverName) : callNode.serverName != null)
+                return false;
+            if (spanId != null ? !spanId.equals(callNode.spanId) : callNode.spanId != null) return false;
+            if (traceId != null ? !traceId.equals(callNode.traceId) : callNode.traceId != null) return false;
+            if (traceName != null ? !traceName.equals(callNode.traceName) : callNode.traceName != null) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = parent != null ? parent.hashCode() : 0;
+            result = 31 * result + children.hashCode();
+            result = 31 * result + (traceId != null ? traceId.hashCode() : 0);
+            result = 31 * result + rpcType;
+            result = 31 * result + (traceName != null ? traceName.hashCode() : 0);
+            result = 31 * result + (int) (entrySign ^ (entrySign >>> 32));
+            result = 31 * result + (int) (nodeSign ^ (nodeSign >>> 32));
+            result = 31 * result + (int) (startTime ^ (startTime >>> 32));
+            result = 31 * result + (int) (last ^ (last >>> 32));
+            result = 31 * result + (remoteIp != null ? remoteIp.hashCode() : 0);
+            result = 31 * result + (serverName != null ? serverName.hashCode() : 0);
+            result = 31 * result + (methodName != null ? methodName.hashCode() : 0);
+            result = 31 * result + (spanId != null ? spanId.hashCode() : 0);
+            result = 31 * result + (parentSpanId != null ? parentSpanId.hashCode() : 0);
+            return result;
         }
     }
 }

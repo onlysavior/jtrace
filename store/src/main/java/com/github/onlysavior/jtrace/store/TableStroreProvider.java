@@ -1,7 +1,5 @@
 package com.github.onlysavior.jtrace.store;
 
-import java.nio.ByteBuffer;
-
 /**
  * Created with IntelliJ IDEA.
  * User: Administrator
@@ -10,6 +8,6 @@ import java.nio.ByteBuffer;
  * To change this template use File | Settings | File Templates.
  */
 public interface TableStroreProvider extends AccessableStroreProvider {
-    public void updateOrStore(String rowKey, int rt);
-    public void updateOrStore(ByteBuffer rowKey, int rt);
+    public void storeInPath(String rowKey, long count);
+    public void storeOutPath(String rowKey, long count);
 }

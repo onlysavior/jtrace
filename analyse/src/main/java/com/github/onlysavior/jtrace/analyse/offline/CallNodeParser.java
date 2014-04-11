@@ -31,57 +31,76 @@ public class CallNodeParser {
             case Jtrace.LOG_TYPE_RPC_END:
                 node = new CallPath.CallNode();
                 parseRpcEnd(node, parts);
+                break;
+            case Jtrace.LOG_TYPE_SERVER_SEND:
+                node = new CallPath.CallNode();
+                parseServerSend(node, parts);
+                break;
+            default:
+                node = null;
 
         }
         return node;
     }
 
-    private CallPath.CallNode parseTraceEnd(CallPath.CallNode node, String[] parts) {
-        if (parts.length < 7) {
+    private void parseServerSend(CallPath.CallNode node, String[] parts) {
+        if (parts.length < 10) {
             throw new AnalyseException("invalid format");
         }
         node.setTraceId(parts[0]);
         node.setStartTime(Long.parseLong(parts[1]));
-        node.setRpcType(Integer.parseInt(parts[2]));
-        node.setLast(Long.parseLong(parts[3]));
-        node.setTraceName(parts[4]);
-        node.setEntrySign(Long.parseLong(parts[5]));
-        node.setNodeSign(Long.parseLong(parts[6]));
+        node.setRpcType(Integer.parseInt(parts[3]));
+    }
 
-        if (parts.length > 7) {
-            node.setServerName(parts[7]);
-            if (parts.length >= 8) {
-                node.setRemoteIp(parts[8]);
+    private CallPath.CallNode parseTraceEnd(CallPath.CallNode node, String[] parts) {
+        if (parts.length < 11) {
+            throw new AnalyseException("invalid format");
+        }
+        node.setTraceId(parts[0]);
+        node.setStartTime(Long.parseLong(parts[1]));
+        node.setRpcType(Integer.parseInt(parts[3]));
+        node.setSpanId(parts[4]);
+        node.setLast(Long.parseLong(parts[5]));
+        node.setParentSpanId(parts[6]);
+        node.setSpanId(parts[7]);
+        node.setRemoteIp(parts[8]);
+        node.setEntrySign(Long.parseLong(parts[9]));
+        node.setNodeSign(Long.parseLong(parts[10]));
+
+        if (parts.length > 11) {
+            node.setServerName(parts[11]);
+            if (parts.length >= 13) {
+                node.setMethodName(parts[12]);
             }
         }
         return node;
     }
 
     private CallPath.CallNode parseRpcEnd(CallPath.CallNode node, String[] parts) {
-        if (parts.length < 11) {
+        if (parts.length < 12) {
             throw new AnalyseException("invalid format");
         }
         node.setTraceId(parts[0]);
         node.setStartTime(Long.parseLong(parts[1]));
-        node.setRpcType(Integer.parseInt(parts[2]));
-        node.setParentSpanId(parts[3]);
-        node.setSpanId(parts[4]);
-        node.setServerName(parts[5]);
-        node.setMethodName(parts[6]);
-        node.setRemoteIp(parts[7]);
+        node.setRpcType(Integer.parseInt(parts[3]));
+        node.setParentSpanId(parts[4]);
+        node.setSpanId(parts[5]);
+        node.setServerName(parts[6]);
+        node.setMethodName(parts[7]);
+        node.setRemoteIp(parts[8]);
 
-        String spans = parts[8];
+        String spans = parts[9];
         node.setLast(parseDuring(spans));
-        node.setTraceName(parts[9]);
-        node.setEntrySign(Long.parseLong(parts[10]));
-        node.setNodeSign(Long.parseLong(parts[11]));
+        node.setTraceName(parts[10]);
+        node.setEntrySign(Long.parseLong(parts[11]));
+        node.setNodeSign(Long.parseLong(parts[12]));
 
         return node;
     }
 
     private Long parseDuring(String spans) {
         String removed = spans.substring(1, spans.length() - 1);
-        String[] durings = spans.split(",");
+        String[] durings = removed.split(",");
         return Long.valueOf(Integer.parseInt(durings[durings.length - 1]) - Integer.parseInt(durings[0]));
     }
 }

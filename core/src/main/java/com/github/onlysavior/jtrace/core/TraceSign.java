@@ -4,7 +4,7 @@ package com.github.onlysavior.jtrace.core;
  * Created by Administrator on 14-4-7.
  */
 public class TraceSign {
-    private static final String SPCHAR = "-";
+    private static final String SPCHAR = "|";
 
     public static long sign(String path) {
         assert path != null : "path is null";

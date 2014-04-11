@@ -62,39 +62,8 @@ public class MySQLStoreProvider extends LifeCycleSupport implements TableStroreP
     }
 
     @Override
-    public void updateOrStore(String rowKey, int rt) {
-        try {
-            updatePs.setNString(1, rowKey);
-            updatePs.setInt(2, rt);
-
-            int rtn = updatePs.executeUpdate();
-            if (rtn == 0) {
-                insertPs.setNString(1, rowKey);
-                insertPs.setInt(2, rt);
-
-                insertPs.execute();
-            }
-        } catch (SQLException e) {
-            throw new StoreException(e);
-        }
-    }
-
-    @Override
-    public void updateOrStore(ByteBuffer rowKey, int rt) {
-        String key = new String(rowKey.array());
-        updateOrStore(key, rt);
-    }
-
-    @Override
-    public List<Serializable> byId(String path) {
-        try {
-            selectPs.setNString(1, extractDate(path));
-
-            ResultSet rs =  selectPs.executeQuery();
-            return collect(rs, null);
-        } catch (SQLException e) {
-            throw new StoreException(e);
-        }
+    public List<Serializable> byId(String traceId) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -164,6 +133,16 @@ public class MySQLStoreProvider extends LifeCycleSupport implements TableStroreP
             throw new StoreException(e);
         }
         return null;
+    }
+
+    @Override
+    public void storeInPath(String rowKey, String path) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void storeOutPath(String rowKey, String path, int rt) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public static class MySQLRow implements Serializable {

@@ -49,7 +49,7 @@ public class TraceContextRollingAppender implements TraceContextAppender {
             logFile = new File(fileName);
             if (!logFile.exists()) {
                 File parentDic = logFile.getParentFile();
-                if (!parentDic.exists() && !parentDic.mkdirs()) {
+                if (parentDic != null && !parentDic.exists() && !parentDic.mkdirs()) {
                     //failed to parent dirs when parent dir not exist
                     doSelfLog("[ERROR] Fail to mkdirs: " + parentDic.getAbsolutePath());
                     return;

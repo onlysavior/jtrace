@@ -178,11 +178,11 @@ public class Jtrace {
 
     static private final void startLogger() {
         TraceContextAppender rpcLogger = new TraceContextRollingAppender(
-                EAGLEEYE_RPC_LOG_FILE, MAX_RPC_LOG_FILE_SIZE, true, true);
+                LOG_FILE_DIR+File.separator+EAGLEEYE_RPC_LOG_FILE, MAX_RPC_LOG_FILE_SIZE, true, true);
         rpcAppender.start(rpcLogger, new DefaultContextEncoder());
     }
 
-    private static void flush() {
+    public static void flush() {
         rpcAppender.flush();
     }
 
@@ -254,7 +254,7 @@ public class Jtrace {
         } catch (Throwable e) {
             selfLog("[ERROR] fail to start EagleEye log check thread", e);
         }
-        selfLog("[INFO] EagleEye started (" + getJtraceLocation() + ")");
+        selfLog("[INFO] Jtrace started (" + getJtraceLocation() + ")");
     }
 
 
@@ -358,7 +358,7 @@ public class Jtrace {
         if (current == null) {
             return;
         }
-        current.endTrace(resultCode, type);
+        current.endRpc(resultCode, type);
         commitTraceContext(current);
         pop();
     }

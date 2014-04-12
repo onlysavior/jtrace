@@ -1,6 +1,7 @@
 package com.github.onlysavior.jtrace.core;
 
 import java.io.Serializable;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -57,8 +58,10 @@ public final class TraceContext implements Serializable {
         this.traceId = traceId;
         this.parentSpanId = parentSpanId;
         this.spanId = spanId;
-        this.parentTraceContext = parentTraceContext;
-        this.entrySign = parentTraceContext.entrySign;
+        if (parentTraceContext != null) {
+            this.parentTraceContext = parentTraceContext;
+            this.entrySign = parentTraceContext.entrySign;
+        }
     }
 
     public TraceContext createChildContext() {
@@ -86,7 +89,7 @@ public final class TraceContext implements Serializable {
     }
 
     String nextSpanId() {
-        return spanId + "." + rpcCounter.incrementAndGet();
+        return UUID.randomUUID().toString().replace("-", "");
     }
 
     public String getRemoteIp() {

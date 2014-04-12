@@ -38,7 +38,7 @@ public class TraceIdGen {
         return appender.toString();
     }
 
-    static String generate() {
+    public static String generate() {
         return getTraceId(IP_16, System.currentTimeMillis(), getNextId());
     }
 

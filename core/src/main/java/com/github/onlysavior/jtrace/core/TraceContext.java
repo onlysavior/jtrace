@@ -109,7 +109,6 @@ public final class TraceContext implements Serializable {
     public void endTrace(String serverName, int rpcType) {
         this.logType = Jtrace.LOG_TYPE_TRACE_END;
         this.endTime = System.currentTimeMillis();
-        this.serverName = serverName;
         this.rpcType = rpcType;
     }
 
@@ -123,7 +122,6 @@ public final class TraceContext implements Serializable {
     public void endRpc(String result, int type) {
         this.logType = Jtrace.LOG_TYPE_RPC_END;
         this.endTime = System.currentTimeMillis();
-        this.traceName = result;
         this.rpcType = type;
         this.spna1 = (int) (this.endTime - this.startTime);
     }

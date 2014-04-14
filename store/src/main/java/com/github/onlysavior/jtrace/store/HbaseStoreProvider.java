@@ -22,6 +22,7 @@ import java.util.List;
  */
 public class HbaseStoreProvider extends LifeCycleSupport implements TableStroreProvider,FastLocate {
     private static final String TABLE_NAME = "jtrace";
+    private static final String TRACE_ID_TABLE = "traceId";
     private static final String FAST_LOCATE_NAME = "fastlocate";
 
     private Configuration configuration;
@@ -43,6 +44,10 @@ public class HbaseStoreProvider extends LifeCycleSupport implements TableStroreP
 
             if (!hAdmin.tableExists(FAST_LOCATE_NAME)) {
                 createTable(hAdmin, FAST_LOCATE_NAME);
+            }
+
+            if (!hAdmin.tableExists(TRACE_ID_TABLE)) {
+                createTable(hAdmin, TRACE_ID_TABLE);
             }
         } catch (Exception e) {
             throw new StoreException(e);
@@ -218,6 +223,23 @@ public class HbaseStoreProvider extends LifeCycleSupport implements TableStroreP
             putFastLocate(rowKey, false);
         }catch (IOException e) {
             throw new StoreException(e);
+        }
+    }
+
+    public void storeTraceId(String traceId, String serverName,String startTime,
+                             Long rt, String path) {
+        try {
+            HTable table = new HTable(configuration, TABLE_NAME);
+            Put put = new Put(Bytes.toBytes(traceId));
+            put.add(Bytes.toBytes("data"), Bytes.toBytes("serverName"), Bytes.toBytes(serverName));
+            put.add(Bytes.toBytes("data"), Bytes.toBytes("startTime"), Bytes.toBytes(startTime));
+            put.add(Bytes.toBytes("data"), Bytes.toBytes("rt"), Bytes.toBytes(rt));
+            if (StringUtils.isNotBlank(path))
+                put.add(Bytes.toBytes("data"), Bytes.toBytes("path"), Bytes.toBytes(path));
+
+            table.put(put);
+        } catch (IOException e) {
+
         }
     }
 

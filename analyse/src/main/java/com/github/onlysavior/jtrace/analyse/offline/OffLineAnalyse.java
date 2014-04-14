@@ -33,7 +33,7 @@ public class OffLineAnalyse extends LifeCycleSupport {
         super.start();
         try {
             sched = gSchedulerFactory.getScheduler();
-            JobDetail jobDetail = JobBuilder.newJob().
+            JobDetail jobDetail = JobBuilder.newJob(MRJob.class).
                     withIdentity("jtraceanalyse", JOB_GROUP_NAME)
                     .build();
             Trigger trigger = TriggerBuilder.newTrigger()
@@ -73,6 +73,9 @@ public class OffLineAnalyse extends LifeCycleSupport {
             conf.setOutputValueClass(LongWritable.class);
             conf.setMapperClass(Mapper.class);
             conf.setReducerClass(Reducer.class);
+            conf.setJarByClass(Mapper.class);
+            conf.set("mapred.job.tracker", "master:50001");
+            conf.set("fs.default.name", "hdfs://master:9000");
 
             conf.setInputFormat(TextInputFormat.class);
             conf.setOutputFormat(TextOutputFormat.class);
@@ -91,6 +94,9 @@ public class OffLineAnalyse extends LifeCycleSupport {
 
                 conf2.setMapperClass(Map2.class);
                 conf2.setReducerClass(Reducer2.class);
+                conf2.setJarByClass(Map2.class);
+                conf2.set("mapred.job.tracker", "master:50001");
+                conf2.set("fs.default.name", "hdfs://master:9000");
 
                 conf2.setInputFormat(TextInputFormat.class);
                 conf2.setOutputFormat(TextOutputFormat.class);

@@ -54,7 +54,7 @@ public class RuntimeSpout extends BaseRichSpout {
                 TraceUtils helper = new TraceUtils(data);
                 collector.emit(new Values(helper.getTraceId(),
                         helper.getData(), helper.getEntrySign(), helper.getNodeSign(),
-                        helper.getRT()));
+                        helper.getRT(), helper.getStartTime(), helper.getServerName()));
             }
         } catch (JMSException e) {
             connect();
@@ -63,7 +63,8 @@ public class RuntimeSpout extends BaseRichSpout {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("traceId","data","entrySign","nodeSign","rt"));
+        outputFieldsDeclarer.declare(new Fields("traceId","data","entrySign","nodeSign",
+                "rt","startTime","serverName"));
     }
 
     private void connect() {

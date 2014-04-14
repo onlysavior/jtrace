@@ -30,6 +30,18 @@ public class TraceUtils {
         return type;
     }
 
+    public String getStartTime() {
+        return dataC[1];
+    }
+
+    public String getServerName() {
+        String serverName = serverName();
+        String traceName = traceName();
+
+        return StringUtils.isNotBlank(serverName) ? serverName :
+                StringUtils.isNotBlank(traceName) ? traceName : null;
+    }
+
     public long getEntrySign() {
         switch (type) {
             case Jtrace.LOG_TYPE_TRACE_END:
@@ -74,5 +86,34 @@ public class TraceUtils {
         String removed = spans.substring(1, spans.length() - 1);
         String[] durings = removed.split(",");
         return Long.valueOf(Integer.parseInt(durings[durings.length - 1]) - Integer.parseInt(durings[0]));
+    }
+
+    private String serverName() {
+        switch (type) {
+            case Jtrace.LOG_TYPE_TRACE_END:
+                if (dataC.length > 10) {
+                    return dataC[10];
+                }
+            case Jtrace.LOG_TYPE_RPC_END:
+                return dataC[6];
+            case Jtrace.LOG_TYPE_SERVER_SEND:
+                if (dataC.length > 10) {
+                    return dataC[10];
+                }
+            default:
+                return null;
+        }
+    }
+
+    private String traceName() {
+        switch (type) {
+            case Jtrace.LOG_TYPE_TRACE_END:
+                return dataC[7];
+            case Jtrace.LOG_TYPE_RPC_END:
+                return dataC[10];
+            case Jtrace.LOG_TYPE_SERVER_SEND:
+            default:
+                return null;
+        }
     }
 }

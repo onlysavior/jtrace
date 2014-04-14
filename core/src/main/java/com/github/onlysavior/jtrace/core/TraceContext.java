@@ -1,5 +1,8 @@
 package com.github.onlysavior.jtrace.core;
 
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
+
 import java.io.Serializable;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -134,7 +137,14 @@ public final class TraceContext implements Serializable {
         this.startTime = System.currentTimeMillis();
         this.serverName = serverName;
         this.methodName = methodName;
-        this.nodeSign = 31*sign + serverName.hashCode();
+        HashFunction hashFunction = Hashing.murmur3_128();
+        if (sign == 0L) {
+            //this.nodeSign = serverName.hashCode();
+            this.nodeSign = hashFunction.hashString(serverName, Jtrace.DEFAULT_CHARACTER).asLong();
+        } else {
+            //this.nodeSign   = 3 * (sign >>> 32 ) + serverName.hashCode();
+            this.nodeSign = 3 * sign ^ hashFunction.hashString(serverName, Jtrace.DEFAULT_CHARACTER).asLong();
+        }
     }
 
     public void rpcServerSend(int type) {
